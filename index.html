@@ -50,12 +50,7 @@
   <div id="overlay"><div id="start-btn">Christmas Gift</div></div>
   <div id="info">MERRY CHRISTMAS</div>
   <div id="instruction">CLICK ANYWHERE TO MORPH</div>
-
-  <audio id="bgm" loop>
-    <source src="https://cdn.pixabay.com/audio/2020/12/17/audio_0343f77366.mp3" type="audio/mp3">
-  </audio>
-
-  <script type="module">
+<script type="module">
     import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
     import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
     import { EffectComposer } from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js';
@@ -90,13 +85,9 @@
       const startBtn = document.getElementById('start-btn');
 
       const startExperience = (ev) => {
+        window.__startExperience = startExperience;
                 // Mobile-friendly: allow tapping anywhere on the overlay
                 if (ev) ev.preventDefault?.();
-
-                const audio = document.getElementById('bgm');
-                audio.volume = 0.6;
-                audio.play().catch(e => console.log("Audio Error:", e));
-
                 overlay.style.opacity = 0;
                 setTimeout(() => overlay.remove(), 1000);
 
@@ -109,6 +100,10 @@
             overlay.addEventListener('pointerup', (e) => {
                 if (e.target && e.target.id === 'overlay') startExperience(e);
             }, { passive: false });
+      // iOS Safari sometimes doesn't fire Pointer Events consistently; add click/touch fallbacks on the overlay too
+      overlay.addEventListener('touchend', startExperience, { passive: false });
+      overlay.addEventListener('click', startExperience);
+
 
             // Fallbacks
             startBtn.addEventListener('touchend', startExperience, { passive: false });
