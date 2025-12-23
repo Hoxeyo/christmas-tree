@@ -44,16 +44,7 @@
       letter-spacing: 2px;
     }
   </style>
-
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-      }
-    }
-  </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
 </head>
 <body>
   <div id="overlay"><div id="start-btn">Christmas Gift</div></div>
@@ -65,12 +56,12 @@
   </audio>
 
   <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+    import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+    import { EffectComposer } from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js';
+    import { RoomEnvironment } from 'https://unpkg.com/three@0.160.0/examples/jsm/environments/RoomEnvironment.js';
 
     let scene, camera, renderer, composer, controls;
     let topStar;
@@ -98,17 +89,31 @@
       const overlay = document.getElementById('overlay');
       const startBtn = document.getElementById('start-btn');
 
-      startBtn.addEventListener('click', () => {
-        const audio = document.getElementById('bgm');
-        audio.volume = 0.6;
-        audio.play().catch(e => console.log("Audio Error:", e));
+      const startExperience = (ev) => {
+                // Mobile-friendly: allow tapping anywhere on the overlay
+                if (ev) ev.preventDefault?.();
 
-        overlay.style.opacity = 0;
-        setTimeout(() => overlay.remove(), 1000);
+                const audio = document.getElementById('bgm');
+                audio.volume = 0.6;
+                audio.play().catch(e => console.log("Audio Error:", e));
 
-        document.getElementById('info').style.opacity = 1;
-        document.getElementById('instruction').style.opacity = 1;
-      });
+                overlay.style.opacity = 0;
+                setTimeout(() => overlay.remove(), 1000);
+
+                document.getElementById('info').style.opacity = 1;
+                document.getElementById('instruction').style.opacity = 1;
+            };
+
+            // Tap/click the button OR the dark overlay area to start
+            startBtn.addEventListener('pointerup', startExperience, { passive: false });
+            overlay.addEventListener('pointerup', (e) => {
+                if (e.target && e.target.id === 'overlay') startExperience(e);
+            }, { passive: false });
+
+            // Fallbacks
+            startBtn.addEventListener('touchend', startExperience, { passive: false });
+            startBtn.addEventListener('click', startExperience);
+
 
       scene = new THREE.Scene();
       scene.fog = new THREE.FogExp2(0x120a07, 0.015);
